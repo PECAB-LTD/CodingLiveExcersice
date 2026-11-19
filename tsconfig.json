@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "es2025",
+        "module": "esnext"
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "src/**/*.ts"
+    ]
+}
