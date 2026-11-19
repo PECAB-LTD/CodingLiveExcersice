@@ -3,19 +3,29 @@ import { createServer } from "node:http";
 import { handleServicesRoute } from "./routes/services";
 
 const server = createServer((req, res) => {
-    let pathName = req.url;
-    console.log("Request received for path: " + pathName + req.method);
-    if (pathName === "/") {
+    
+    const address = new URL(req.url, "http://127.0.0.1:3000");
+    const pathname = address.pathname;
+    console.log("Request received for path: " + address.pathname, " " + req.method);
+    if (pathname === "/" || pathname === "/home") {
+        
+        res.end("Welcome to E-Solutions API");
 
+        return;
     }
 
-    if (pathName === "/services") {
+    if (pathname === "/services") {
         handleServicesRoute(req, res);
+
+        return;
     }
 
     else {
         res.setHeader("Content-Type", "text/html");
+        res.statusCode = 404;
         res.end("<h1>404 Not Found</h1>");
+
+        return;
     }
 
 });
