@@ -1,9 +1,9 @@
 import { services } from "../data/services";
 
-export function handleServicesRoute(req, res) {
+export async function handleServicesRoute(req, res) {
 
-    if (req.method !== "GET") {
-        res.setHeader("Allow", "GET");
+    if (req.method !== "GET" && req.method !== "POST") {
+        res.setHeader("Allow", "GET, POST");
         res.statusCode = 405;
         res.setHeader("Content-Type", "text/html");
         res.end("<h1>405 Method Not Allowed</h1>");
@@ -12,6 +12,25 @@ export function handleServicesRoute(req, res) {
 
     res.setHeader("Content-Type", "application/json");
 
+        // Handle POST request: Create a new service
+    if (req.method === "POST") {
+        let body = "";
+        for await (const chunk of req) {
+            body += chunk;
+        }
+
+        const newService = JSON.parse(body);
+        newService.id = services.length + 1;
+        services.push(newService);
+
+    
+        res.statusCode = 201;
+        res.end(JSON.stringify(newService));
+        console.log(newService, "NEW SERVICE ADDED!");
+        return;
+    }
+
+    //url parameters for filtering services
     const address = new URL(req.url, "http://127.0.0.1:3000");
     const budgetText = address.searchParams.get("budget");
     const categoryText = address.searchParams.get("category");

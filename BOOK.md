@@ -26,6 +26,7 @@ A step-by-step companion book explaining every single concept, line of code, and
 18. [Case-Insensitive & Partial Matching (`.toLowerCase()` and `.includes()`)](#chapter-18-case-insensitive--partial-matching-tolowercase-and-includes)
 19. [Filter Chaining: Sieve Pipeline Architecture](#chapter-19-filter-chaining-sieve-pipeline-architecture)
 20. [Plucking a Single Record: `.find()` vs `.filter()`](#chapter-20-plucking-a-single-record-find-vs-filter)
+21. [Creating Data with `POST`: Modern Async Streams & Persistence](#chapter-21-creating-data-with-post-modern-async-streams--persistence)
 
 ---
 
@@ -511,6 +512,54 @@ if (serviceIdText !== null) {
     }
 }
 ```
+
+---
+
+## Chapter 21: Creating Data with `POST`: Modern Async Streams & Persistence
+
+So far, our API has only read existing data (`GET`). Real applications also need to accept submissions from clients—such as booking an appointment or creating a new service item (`POST`).
+
+### 1. `GET` vs `POST`: Where Data Travels
+- In a **`GET`** request, parameters travel in the public URL bar (`?budget=75`).
+- In a **`POST`** request, data travels inside the **HTTP Request Body** (the payload parcel).
+
+### 2. Modern Asynchronous Body Streaming (`for await...of`)
+Older Node.js patterns relied on callback event listeners (`req.on("data")` and `req.on("end")`). Modern JavaScript (ES2022+) provides clean async iteration:
+
+```ts
+export async function handleServicesRoute(req, res) {
+    if (req.method === "POST") {
+        let body = "";
+        
+        // Asynchronously stream the incoming payload chunks
+        for await (const chunk of req) {
+            body += chunk;
+        }
+
+        // Reconstruct the text into a JavaScript object
+        const newService = JSON.parse(body);
+
+        // Assign a unique ID and store in memory
+        newService.id = services.length + 1;
+        services.push(newService);
+
+        // Respond with HTTP 201 Created
+        res.statusCode = 201;
+        res.end(JSON.stringify(newService));
+        return;
+    }
+}
+```
+
+### 3. Two-Way JSON Translation
+- **`JSON.stringify(object)`**: Converts internal code objects into text strings to transmit over the network to browsers or clients.
+- **`JSON.parse(string)`**: Converts raw network text back into an executable JavaScript object whose properties (`newService.name`, `newService.price`) can be accessed.
+
+### 4. Memory (RAM) vs Database Persistence
+When a service is added to the in-memory `services` array:
+- It is immediately queryable by any subsequent `GET` request.
+- However, variables reside in temporary system memory (RAM). When the server process restarts, the array resets back to its hardcoded file defaults.
+- This distinction defines why real-world production backends connect to databases (PostgreSQL, SQLite, Cloudflare D1) to persist state to disk.
 
 ---
 
