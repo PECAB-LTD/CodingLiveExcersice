@@ -27,6 +27,7 @@ A step-by-step companion book explaining every single concept, line of code, and
 19. [Filter Chaining: Sieve Pipeline Architecture](#chapter-19-filter-chaining-sieve-pipeline-architecture)
 20. [Plucking a Single Record: `.find()` vs `.filter()`](#chapter-20-plucking-a-single-record-find-vs-filter)
 21. [Creating Data with `POST`: Modern Async Streams & Persistence](#chapter-21-creating-data-with-post-modern-async-streams--persistence)
+22. [SQLite Database Persistence & `DELETE` Operations](#chapter-22-sqlite-database-persistence--delete-operations)
 
 ---
 
@@ -560,6 +561,95 @@ When a service is added to the in-memory `services` array:
 - It is immediately queryable by any subsequent `GET` request.
 - However, variables reside in temporary system memory (RAM). When the server process restarts, the array resets back to its hardcoded file defaults.
 - This distinction defines why real-world production backends connect to databases (PostgreSQL, SQLite, Cloudflare D1) to persist state to disk.
+
+---
+
+## Chapter 22: SQLite Database Persistence & `DELETE` Operations
+
+### 1. From Ephemeral RAM to Disk Persistence
+Storing items in an in-memory array (`const services = [...]`) means any server restart or process crash wipes newly added data.
+
+A database solves this by recording operations to a durable file on the hard drive. We used **`better-sqlite3`**:
+- **Zero server overhead:** The database is a single local file (`src/data/esolutions.db`).
+- **Standard SQL:** The exact same SQL dialects used in Cloudflare D1 and production relational databases.
+
+### 2. Initializing & Seeding Schema (`src/data/db.ts`)
+```ts
+import Database from "better-sqlite3";
+
+export const db = new Database("src/data/esolutions.db");
+
+// Auto-create table schema if absent
+db.exec(`
+  CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    category TEXT NOT NULL
+  )
+`);
+```
+- `INTEGER PRIMARY KEY AUTOINCREMENT`: SQLite manages unique incremental ID assignment automatically upon insertion.
+
+### 3. Inserting Data with Prepared Statements (`POST`)
+To prevent security vulnerabilities (like SQL Injection), database values are never glued with string concatenation. Instead, we use parameterized prepared statements with `?` placeholders:
+
+```ts
+const insertStmt = db.prepare("INSERT INTO services (name, price, category) VALUES (?, ?, ?)");
+const info = insertStmt.run(newService.name, newService.price, newService.category);
+
+// Retrieve the database-generated ID
+newService.id = Number(info.lastInsertRowid);
+```
+
+### 4. Reading Fresh Records (`GET`)
+To ensure queries always return current live state without stale in-memory caching:
+```ts
+let results = db.prepare("SELECT * FROM services").all();
+```
+
+### 5. Deleting Records (`DELETE`)
+When removing an item, the client specifies the target record via query parameter (`DELETE /services?id=11`).
+
+We execute the deletion and inspect `info.changes` to verify if a record was actually removed:
+```ts
+if (req.method === "DELETE") {
+    const address = new URL(req.url, "http://127.0.0.1:3000");
+    const serviceIdText = address.searchParams.get("id");
+
+    if (serviceIdText === null) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: "Please provide a service ID to delete" }));
+        return;
+    }
+
+    const serviceId = Number(serviceIdText);
+    const deleteStmt = db.prepare("DELETE FROM services WHERE id = ?");
+    const info = deleteStmt.run(serviceId);
+
+    // 0 changes means the record never existed in the database
+    if (info.changes === 0) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: "Service not found" }));
+        return;
+    }
+
+    // Successfully deleted
+    res.statusCode = 200;
+    res.end(JSON.stringify({ message: "Service deleted successfully", id: serviceId }));
+    return;
+}
+```
+
+### 6. Summary of the Complete REST CRUD Matrix
+
+| Operation | HTTP Method | SQL Command | Success Code | Missing Code |
+|---|---|---|---|---|
+| **Create** | `POST /services` | `INSERT INTO services ...` | `201 Created` | — |
+| **Read (All/Filter)** | `GET /services` | `SELECT * FROM services` | `200 OK` | `[]` (Empty) |
+| **Read (Single)** | `GET /services?id=1` | `.find()` | `200 OK` | `404 Not Found` |
+| **Delete** | `DELETE /services?id=1` | `DELETE FROM services WHERE id = ?` | `200 OK` | `404 Not Found` |
+| **Invalid Method** | `PUT / PATCH` | — | `405 Method Not Allowed` | — |
 
 ---
 

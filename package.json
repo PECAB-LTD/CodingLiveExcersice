@@ -4,11 +4,15 @@
     "private": true,
     "type": "module",
     "devDependencies": {
+        "@types/better-sqlite3": "^9.6.0",
         "@types/node": "^26.6.6",
         "tsx": "^4.23.15",
         "typescript": "^7.0.2"
     },
     "scripts": {
         "dev": "tsx watch src/server.ts"
+    },
+    "dependencies": {
+        "better-sqlite3": "^13.2.0"
     }
 }
