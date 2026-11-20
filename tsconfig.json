@@ -3,10 +3,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "strict": false,
-    "types": [
-      "node"
-    ]
+    "strict": false
   },
   "include": [
     "src/**/*.ts"

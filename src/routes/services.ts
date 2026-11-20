@@ -1,5 +1,12 @@
 import { db } from "../data/db";
 
+interface Service {
+    id: number;
+    name: string;
+    price: number;
+    category: string;
+}
+
 //List of services from the database
 
 export async function handleServicesRoute(req, res) {
@@ -68,7 +75,7 @@ export async function handleServicesRoute(req, res) {
 
 
     // Start with all services and apply filters based on query parameters
-    let results = db.prepare("SELECT * FROM services").all();
+    let results = db.prepare("SELECT * FROM services").all() as Service[];
 
     // If a category was typed in the URL (?category=Electronics)
     if (categoryText !== null) {
