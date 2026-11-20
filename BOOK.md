@@ -22,6 +22,10 @@ A step-by-step companion book explaining every single concept, line of code, and
 14. [The Lifecycle of a Request: The Phone Call Analogy](#chapter-14-the-lifecycle-of-a-request-the-phone-call-analogy)
 15. [Why `return;` Matters: Preventing Double Answers](#chapter-15-why-return-matters-preventing-double-answers)
 16. [Git & GitHub: Snapshots, `.gitignore`, and Repositories](#chapter-16-git--github-snapshots-gitignore-and-repositories)
+17. [URL Query Parameters & Search Params](#chapter-17-url-query-parameters--search-params)
+18. [Case-Insensitive & Partial Matching (`.toLowerCase()` and `.includes()`)](#chapter-18-case-insensitive--partial-matching-tolowercase-and-includes)
+19. [Filter Chaining: Sieve Pipeline Architecture](#chapter-19-filter-chaining-sieve-pipeline-architecture)
+20. [Plucking a Single Record: `.find()` vs `.filter()`](#chapter-20-plucking-a-single-record-find-vs-filter)
 
 ---
 
@@ -393,6 +397,120 @@ node_modules/
 
 We transferred our repository to your organization **PECAB-LTD**:
 🔗 **[https://github.com/PECAB-LTD/CodingLiveExcersice](https://github.com/PECAB-LTD/CodingLiveExcersice)**
+
+---
+
+## Chapter 17: URL Query Parameters & Search Params
+
+When visitors request data from a web API, they often want to customize what they see without changing the base path:
+
+```
+http://127.0.0.1:3000/services?budget=75&category=Jewelery
+                      ▲       ▲
+                      │       └── Query Parameters: Starts with '?'
+                      └────────── Path Name: The resource requested
+```
+
+### Reading Parameters in Node.js
+Using the standard `new URL(req.url, "http://127.0.0.1:3000")`:
+- `address.pathname`: Extracts the pure path (`"/services"`), stripping away all queries.
+- `address.searchParams.get("key")`: Retrieves the value of a specific parameter.
+  - If present: returns the text (e.g. `"75"`).
+  - If missing: returns `null`.
+  - Automatically decodes URL encodings (like `%20` or `+` into spaces `" "`).
+
+---
+
+## Chapter 18: Case-Insensitive & Partial Matching (`.toLowerCase()` and `.includes()`)
+
+Real human customers do not search with perfect capitalization or exact full titles:
+- A customer might type `category=jewelry` or `category=JEWELRY`.
+- A customer might type `name=phone` expecting to find `"Iphone 18 Pro"`.
+
+### 1. Case-Insensitive Matching
+By converting **both** sides of a comparison to lowercase, case differences disappear:
+```ts
+service.category.toLowerCase() === categoryText.toLowerCase()
+```
+
+### 2. Partial Search with `.includes()`
+The `.includes()` string method checks if a substring exists anywhere inside another string:
+```ts
+service.name.toLowerCase().includes(serviceNameText.toLowerCase())
+```
+- Searching `"phone"` matches `"Iphone 18 Pro"`.
+- Searching `"ring"` matches `"Gold Ring"`.
+
+---
+
+## Chapter 19: Filter Chaining: Sieve Pipeline Architecture
+
+A major trap when writing multiple filters is putting `res.end()` and `return;` inside every `if` block:
+
+```ts
+// ❌ TRAP: Whichever if matches first exits the function immediately!
+if (categoryText !== null) { ... res.end(); return; }
+if (budgetText !== null)   { ... res.end(); return; }
+```
+When written with early returns, querying `?category=Jewelery&budget=130` will **only** run the category filter and completely ignore the budget!
+
+### The Solution: The Sieve Pipeline
+Instead of returning immediately, we maintain a mutable `results` variable that starts with all records and is progressively narrowed down by each active filter:
+
+```ts
+let results = services;
+
+// Sieve 1: Narrow down by category
+if (categoryText !== null) {
+    results = results.filter(s => s.category.toLowerCase() === categoryText.toLowerCase());
+}
+
+// Sieve 2: Narrow down surviving results by budget
+if (budgetText !== null) {
+    const budget = Number(budgetText);
+    results = results.filter(s => s.price <= budget);
+}
+
+// Sieve 3: Narrow down surviving results by name search
+if (serviceNameText !== null) {
+    results = results.filter(s => s.name.toLowerCase().includes(serviceNameText.toLowerCase()));
+}
+
+// Single Response: Send the final survivors
+res.end(JSON.stringify(results));
+return;
+```
+
+---
+
+## Chapter 20: Plucking a Single Record: `.find()` vs `.filter()`
+
+Every database item should have a unique, permanent identifier (`id`).
+
+| Tool | Purpose | What it Returns |
+|---|---|---|
+| **`.filter(...)`** | Searches the whole collection for all matches. | Always an **Array** `[ { ... } ]`, even if only 1 item matches. |
+| **`.find(...)`** | Stops at the first match and plucks that item. | The **Single Object** `{ ... }` directly (or `undefined`). |
+
+### The Emergency Door Pattern for ID Lookups:
+Because `.find()` returns a single object rather than an array, subsequent `.filter()` calls will crash (`TypeError: results.filter is not a function`).
+
+Therefore, single-item lookups require an immediate exit door:
+```ts
+if (serviceIdText !== null) {
+    const serviceId = Number(serviceIdText);
+    const item = services.find(s => s.id === serviceId);
+
+    if (item) {
+        res.end(JSON.stringify(item));
+        return; // 🚪 Send item and exit immediately
+    } else {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: "Service not found" }));
+        return; // 🚪 Send 404 and exit immediately
+    }
+}
+```
 
 ---
 
