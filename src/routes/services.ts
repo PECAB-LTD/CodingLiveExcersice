@@ -4,7 +4,9 @@ interface Service {
     id: number;
     name: string;
     price: number;
+    currency: string;
     category: string;
+    inventory: number;
 }
 
 //List of services from the database
@@ -29,8 +31,8 @@ export async function handleServicesRoute(req, res) {
         }
 
         const newService = JSON.parse(body);
-        const insertStmt = db.prepare("INSERT INTO services (name, price, category) VALUES (?, ?, ?)");
-        const info = insertStmt.run(newService.name, newService.price, newService.category);
+        const insertStmt = db.prepare("INSERT INTO services (name, price, currency, category, inventory) VALUES (?, ?, ?, ?, ?, ?)");
+        const info = insertStmt.run(newService.name, newService.price, newService.currency, newService.category, newService.inventory);
         newService.id = Number(info.lastInsertRowid);
 
 
