@@ -1,6 +1,10 @@
 import { createServer } from "node:http";
+import { runMigrationsAndSeeds } from "./data/migrate";
 
 import { handleServicesRoute } from "./routes/services";
+import { handleSalesRoutes } from "./routes/sales";
+
+runMigrationsAndSeeds()
 
 const server = createServer((req, res) => {
 
@@ -20,6 +24,11 @@ const server = createServer((req, res) => {
         return;
     }
 
+    if (pathname === "/sales") {
+        handleSalesRoutes(req, res);
+        return;
+    }
+    
     else {
         res.setHeader("Content-Type", "text/html");
         res.statusCode = 404;
@@ -27,6 +36,7 @@ const server = createServer((req, res) => {
 
         return;
     }
+
 
 });
 server.listen(3000, "127.0.0.1", () => {
