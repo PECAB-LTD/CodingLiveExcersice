@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="/index.css">
+    <title>SALES.EDU.SERVICES</title>
+</head>
+
+<body>
+    <div id="companyName">
+        <h1>SALES.EDU - Services</h1>
+        <h2>Where Dreams Come True</h2>
+        <h4>Lets Make Some Sales</h4>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Menu</legend>
+            <button id="homePage">Home</button>
+            <button id="servicesPage">Services</button>
+            <button id="salesPage">Sales</button>
+        </fieldset>
+    </div>
+
+
+    <div id="topButtons">
+        <fieldset>
+            <legend></legend>
+            <button type="button" id="loadServicesBtn">Load Services</button>
+            <button type="button">Refresh List</button>
+        </fieldset>
+    </div>
+
+    <div id="inventoryFilters">
+        <fieldset>
+            <legend>Filters</legend>
+            <label for="itemId">Item Id:</label>
+            <input type="number" id="itemId" placeholder="Id">
+            <label for="itemName">Item Name:</label>
+            <input type="text" id="itemName" placeholder="Name">
+            <label for="itemCategory">Item Category:</label>
+            <input type="text" id="itemCategory" placeholder="Category">
+            <label for="ItemPrice">Item Price:</label>
+            <input type="number" id="itemPrice" placeholder="Price">
+
+        </fieldset>
+    </div>
+
+    <div id="listLoader">
+        <fieldset>
+            <div id="list">
+               
+            </div><br>
+
+        </fieldset>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Cart Summary</legend>
+            <textarea name="totalQty" id="totalQty"></textarea>
+            <textarea name="totalAmount" id="totalAmount"></textarea>
+        </fieldset>
+    </div>
+    <div id="bottomButtons">
+        <button type="button">
+            Check Out
+        </button>
+    </div>
+
+
+
+<script src="/services.js"></script>
+</body>
+
+
+</html>

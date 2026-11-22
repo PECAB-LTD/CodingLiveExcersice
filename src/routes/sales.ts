@@ -1,7 +1,7 @@
 import { db } from "../data/db";
 
 export async function handleSalesRoutes(req, res) {
-
+    
     if (req.method !== "GET" && req.method !== "POST" && req.method !== "DELETE") {
         res.setHeader("Allow", "GET, POST, DELETE");
         res.statusCode = 405;
