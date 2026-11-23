@@ -1,7 +1,7 @@
 import { db } from "../data/db";
 
 export async function handleSalesRoutes(req, res) {
-    
+
     if (req.method !== "GET" && req.method !== "POST" && req.method !== "DELETE") {
         res.setHeader("Allow", "GET, POST, DELETE");
         res.statusCode = 405;
@@ -76,8 +76,16 @@ export async function handleSalesRoutes(req, res) {
             return;
         }
     }
-    const allSales = db.prepare("SELECT * FROM sales").all();
+
+    //data joined from services table
+    const allSales = db.prepare(`
+    SELECT 
+        sales.*, 
+        services.name AS service_name, 
+        services.category AS service_category
+    FROM sales
+    JOIN services ON sales.service_id = services.id
+`).all();
     res.end(JSON.stringify(allSales));
     return;
-}
-
+};

@@ -118,7 +118,15 @@ export async function handleServicesRoute(req, res) {
         console.log("4. SERVICE NAME FILTER RAN!");
     }
 
-    // Otherwise, just show all services
-    res.end(JSON.stringify(results));
+        //data joined from sales table
+    const allServices = db.prepare(`
+    SELECT 
+        services.*, 
+        MAX(sales.created_at) AS last_sale
+    FROM services
+    LEFT JOIN sales ON services.id = sales.service_id
+    GROUP BY services.id
+`).all();
+    res.end(JSON.stringify(allServices));
     return;
-}
+};

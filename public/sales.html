@@ -17,9 +17,9 @@
     <div>
         <fieldset>
             <legend>Menu</legend>
-            <button id="homePage">Home</button>
-            <button id="servicesPage">Services</button>
-            <button id="salesPage">Sales</button>
+            <a href="/"><button type="button">Home</button></a>
+            <a href="/services"><button type="button">Services</button></a>
+            <button type="button">Sales</button>
         </fieldset>
     </div>
 
@@ -49,18 +49,32 @@
 
     <div id="listLoader">
         <fieldset>
-            <div id="list">
-                <p id="list"></p>
-            </div><br>
-
+            <legend>Sales Records</legend>
+            <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>Sale ID</th>
+                        <th>Product ID</th>
+                        <th>Name</th>
+                        <th>category</th>
+                        <th>Qty Sold</th>
+                        <th>Total Price</th>
+                        <th>Date</th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- JavaScript will insert rows here! -->
+                </tbody>
+            </table>
         </fieldset>
     </div>
 
-    <div>
+    <div id="SalesSummaries">
         <fieldset>
-            <legend>Cart Summary</legend>
-            <textarea name="totalQty" id="totalQty"></textarea>
-            <textarea name="totalAmount" id="totalAmount"></textarea>
+            <div id="ongoingSaleSummary">
+
+            </div>
         </fieldset>
     </div>
     <div id="bottomButtons">
@@ -68,7 +82,7 @@
             Check Out
         </button>
     </div>
-<script src="/sales.js"></script>
+    <script src="/sales.js"></script>
 </body>
 
 

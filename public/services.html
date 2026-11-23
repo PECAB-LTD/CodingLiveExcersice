@@ -17,9 +17,9 @@
     <div>
         <fieldset>
             <legend>Menu</legend>
-            <button id="homePage">Home</button>
-            <button id="servicesPage">Services</button>
-            <button id="salesPage">Sales</button>
+            <a href="/"><button type="button">Home</button></a>
+            <button type="button">Services</button>
+            <a href="/sales"><button type="button">Sales</button></a>
         </fieldset>
     </div>
 
@@ -47,12 +47,24 @@
         </fieldset>
     </div>
 
-    <div id="listLoader">
+        <div id="listLoader">
         <fieldset>
-            <div id="list">
-               
-            </div><br>
-
+            <legend>Sales Records</legend>
+            <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>ID</th>
+                        <th>Item Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Inventory</th>
+                        <th>Last Sale</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- JavaScript will insert rows here! -->
+                </tbody>
+            </table>
         </fieldset>
     </div>
 

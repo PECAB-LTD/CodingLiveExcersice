@@ -1,22 +1,27 @@
 const loadBtn = document.getElementById("loadServicesBtn");
-const listDiv = document.getElementById("list");
+const tbody = document.getElementById("salesTableBody");
 
 loadBtn.addEventListener("click", async () => {
-    listDiv.innerHTML = "<em>Loading services...</em>";
 
+    
     // 1. Fetch data from your backend
     const res = await fetch("/api/services");
     const services = await res.json();
 
     // 2. Clear loading text
-    listDiv.innerHTML = "";
+    tbody.innerHTML = "";
 
     // 3. Render each service into the list container
-    for (const s of services) {
-        const item = document.createElement("div");
-        item.style.padding = "8px 0";
-        item.style.borderBottom = "1px solid #eee";
-        item.innerHTML = `<strong>#${s.id} ${s.name}</strong> - Price: ${s.price} ${s.currency} | Stock: <strong>${s.inventory}</strong>`;
-        listDiv.appendChild(item);
+        for (const s of services) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>${s.price} ${s.currency}</td>
+            <td>${s.category}</td>
+            <td>${s.inventory}</td>
+            <td>${s.last_sale}</td>
+        `;
+        tbody.appendChild(row);
     }
 });

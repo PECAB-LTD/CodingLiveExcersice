@@ -1,22 +1,26 @@
 const loadBtn = document.getElementById("loadSalesBtn");
-const listDiv = document.getElementById("list");
+const tbody = document.getElementById("salesTableBody");
 
 loadBtn.addEventListener("click", async () => {
-    listDiv.innerHTML = "<em>Loading sales...</em>";
-
-    // 1. Fetch data from your backend
+    // 1. Fetch data
     const res = await fetch("/api/sales");
     const sales = await res.json();
 
-    // 2. Clear loading text
-    listDiv.innerHTML = "";
+    // 2. Clear old rows
+    tbody.innerHTML = "";
 
-    // 3. Render each service into the list container
+    // 3. Insert each row cleanly under the column headers
     for (const s of sales) {
-        const item = document.createElement("div");
-        item.style.padding = "8px 0";
-        item.style.borderBottom = "1px solid #eee";
-        item.innerHTML = `${s.id} | ${s.service_id} | ${s.quantity} | ${s.total_price} | ${s.created_at} | ${s.currency}`;
-        listDiv.appendChild(item);
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${s.id}</td>
+            <td>${s.service_id}</td>
+            <td>${s.service_name}</td>
+            <td>${s.service_category}</td>
+            <td>${s.quantity}</td>
+            <td>${s.currency} ${s.total_price}</td>
+            <td><small>${s.created_at}</small></td>
+        `;
+        tbody.appendChild(row);
     }
 });
