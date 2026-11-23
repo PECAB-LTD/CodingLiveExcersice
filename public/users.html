@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="/index.css">
+    <title>SALES.EDU.SERVICES</title>
+</head>
+
+<body>
+    <div id="companyName">
+        <h1>SALES.EDU - Services</h1>
+        <h2>Where Dreams Come True</h2>
+        <h4>Lets Make Some Sales</h4>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Menu</legend>
+            <a href="/"><button type="button">Home</button></a>
+            <button type="button">Services</button>
+            <a href="/sales"><button type="button">Sales</button></a>
+            <button>Elaija</button>
+            <p>elaijah</p>
+        </fieldset>
+    </div>
+
+
+    <div id="topButtons">
+        <fieldset>
+            <legend></legend>
+            <button type="button" id="loadServicesBtn">Load Services</button>
+            <button type="button">Refresh List</button>
+        </fieldset>
+    </div>
+
+    <div id="inventoryFilters">
+        <fieldset>
+            <legend>Filters</legend>
+            <label for="itemId">Item Id:</label>
+            <input type="number" id="itemId" placeholder="Id">
+            <label for="itemName">Item Name:</label>
+            <input type="text" id="itemName" placeholder="Name">
+            <label for="itemCategory">Item Category:</label>
+            <input type="text" id="itemCategory" placeholder="Category">
+            <label for="ItemPrice">Item Price:</label>
+            <input type="number" id="itemPrice" placeholder="Price">
+            <input type="text" placeholder="Elaijah">
+
+        </fieldset>
+    </div>
+
+        <div id="listLoader">
+        <fieldset>
+            <legend>Sales Records</legend>
+            <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>Select</th>
+                        <th>ID</th>
+                        <th>Item Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Inventory</th>
+                        <th>Last Sale</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- JavaScript will insert rows here! -->
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+
+<script src="/users.js"></script>
+</body>
+</html>

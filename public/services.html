@@ -20,6 +20,8 @@
             <a href="/"><button type="button">Home</button></a>
             <button type="button">Services</button>
             <a href="/sales"><button type="button">Sales</button></a>
+            <button>Elaija</button>
+            <p>elaijah</p>
         </fieldset>
     </div>
 
@@ -43,6 +45,7 @@
             <input type="text" id="itemCategory" placeholder="Category">
             <label for="ItemPrice">Item Price:</label>
             <input type="number" id="itemPrice" placeholder="Price">
+            <input type="text" placeholder="Elaijah">
 
         </fieldset>
     </div>
@@ -53,6 +56,7 @@
             <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
                 <thead>
                     <tr style="background-color: #f2f2f2;">
+                        <th>Select</th>
                         <th>ID</th>
                         <th>Item Name</th>
                         <th>Price</th>
@@ -71,8 +75,22 @@
     <div>
         <fieldset>
             <legend>Cart Summary</legend>
-            <textarea name="totalQty" id="totalQty"></textarea>
-            <textarea name="totalAmount" id="totalAmount"></textarea>
+<table id="cartTable" border="1" style="align-content: center; margin: 1%; padding: 1%; height: fit-content; width: 50%;">
+    <thead id="cartTableHead">
+    <th>Total Items</th>
+    <th>Total Price</th>
+    <th>Discount</th>
+    <th>Payable Price</th>
+    </thead>
+    <tbody id="cartTableDataSummary">
+<tr>
+    <td id="summaryItemsCount">0</td>
+    <td id="summaryItemsPrice">0 QAR</td>
+    <td id="summaryItemsDiscount">0 QAR</td>
+    <td id="summaryItemsPayable">0 QAR</td>
+</tr>
+    </tbody>
+</table>
         </fieldset>
     </div>
     <div id="bottomButtons">
