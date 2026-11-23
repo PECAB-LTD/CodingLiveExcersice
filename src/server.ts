@@ -4,7 +4,9 @@ import { runMigrationsAndSeeds } from "./data/migrate";
 
 import { handleServicesRoute } from "./routes/services";
 import { handleSalesRoutes } from "./routes/sales";
+import { handleUsersRoutes } from "./routes/users";
 import { time, timeStamp } from "node:console";
+import path from "node:path/win32";
 
 runMigrationsAndSeeds()
 
@@ -37,23 +39,9 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // HTML Page: Sales
-    if (pathname === "/sales") {
-        const sales = readFileSync("public/sales.html", "utf-8");
-        res.setHeader("Content-Type", "text/html");
-        res.end(sales);
-        return;
-    }
-
     // JSON API: Services
     if (pathname === "/api/services") {
         handleServicesRoute(req, res);
-        return;
-    }
-
-    // JSON API: Sales
-    if (pathname === "/api/sales") {
-        handleSalesRoutes(req, res);
         return;
     }
 
@@ -64,8 +52,46 @@ const server = createServer((req, res) => {
         res.end(js);
         return;
     }
+
+    // HTML Page: Sales
+    if (pathname === "/sales") {
+        const sales = readFileSync("public/sales.html", "utf-8");
+        res.setHeader("Content-Type", "text/html");
+        res.end(sales);
+        return;
+    }
+
+
+
+    // JSON API: Sales
+    if (pathname === "/api/sales") {
+        handleSalesRoutes(req, res);
+        return;
+    }
+
+
     // Serve Sales JavaScript
     if (pathname === "/sales.js") {
+        const js = readFileSync("public/sales.js", "utf-8");
+        res.setHeader("Content-Type", "application/javascript");
+        res.end(js);
+        return;
+    }
+
+    if (pathname === "/users") {
+        const users = readFileSync("public/users.html", "utf-8");
+        res.setHeader("Content-Type", "text/html");
+        res.end(users);
+        return;
+
+    }
+
+    if (pathname === "/api/users") {
+        handleUsersRoutes(req, res);
+        return;
+    }
+
+    if (pathname === "/users.js") {
         const js = readFileSync("public/sales.js", "utf-8");
         res.setHeader("Content-Type", "application/javascript");
         res.end(js);
