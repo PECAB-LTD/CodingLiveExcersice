@@ -1,7 +1,7 @@
 // ─── PAGE ELEMENTS ──────────────────────────────────────────────────────────
 // These are the HTML elements on the page we will interact with
-const loadUsersButton = document.getElementById("loadServicesBtn");
-const usersTableBody  = document.getElementById("salesTableBody");
+const loadUsersButton = document.getElementById("loadUsersBtn");
+const usersTableBody  = document.getElementById("usersTableBody");
 
 // ─── CART STATE ──────────────────────────────────────────────────────────────
 // The basket. Holds the service objects the user has checked.
@@ -12,7 +12,7 @@ let selectedUsers = [];
 // ─── FUNCTION: Fetch all services from the backend ──────────────────────────
 // Goes to our Node server, asks for /api/services, returns the JSON list.
 async function fetchUsers() {
-    const response = await fetch("/api/admin-users");
+    const response = await fetch("/api/users");
     const users = await response.json();
     return users;
 }
@@ -21,16 +21,18 @@ async function fetchUsers() {
 // ─── FUNCTION: Build one table row for a single service ─────────────────────
 // Takes one service object, creates a <tr> with all its data inside <td> cells.
 // Returns the finished row element (not yet on the page).
-function buildServiceRow(service) {
+function buildServiceRow(user) {
     const row = document.createElement("tr");
     row.innerHTML = `
         <td><input type="checkbox" class="cartCheckbox"></td>
-        <td>${service.id}</td>
-        <td>${service.name}</td>
-        <td>${service.price} ${service.currency}</td>
-        <td>${service.category}</td>
-        <td>${service.inventory}</td>
-        <td>${service.last_sale ?? "No sales yet"}</td>
+        <td>${user.id}</td>
+        <td>${user.name}</td>
+        <td>${user.employee_number}</td>
+        <td>${user.position}</td>
+        <td>${user.phone}</td>
+        <td>${user.email}</td>
+        <td>${user.password}</td>
+        <td>${user.created_at}</td>
     `;
     return row;
 }
@@ -41,14 +43,14 @@ function buildServiceRow(service) {
 // When checked   → adds the service to the cart basket.
 // When unchecked → removes the service from the cart basket.
 // After every change → recalculates and displays the cart summary.
-function wireCheckboxToCart(row, service) {
+function wireCheckboxToCart(row, user) {
     const checkbox = row.querySelector(".cartCheckbox");
 
     checkbox.addEventListener("change", () => {
         if (checkbox.checked) {
-            addServiceToCart(service);
+            addServiceToCart(user);
         } else {
-            removeServiceFromCart(service);
+            removeServiceFromCart(user);
         }
     });
 }
@@ -56,8 +58,8 @@ function wireCheckboxToCart(row, service) {
 
 // ─── FUNCTION: Add a service to the cart ────────────────────────────────────
 // Pushes the service object into the cart array, then refreshes the summary.
-function addServiceToCart(service) {
-    cart.push(service);
+function addServiceToCart(user) {
+    cart.push(user);
     updateCartSummary();
 }
 
@@ -65,8 +67,8 @@ function addServiceToCart(service) {
 // ─── FUNCTION: Remove a service from the cart ───────────────────────────────
 // Rebuilds the cart array excluding the service that was just unchecked.
 // Uses .filter() — keeps every item whose id does NOT match the removed one.
-function removeServiceFromCart(service) {
-    cart = cart.filter(cartItem => cartItem.id !== service.id);
+function removeServiceFromCart(user) {
+    cart = cart.filter(cartItem => cartItem.id !== user.id);
     updateCartSummary();
 }
 
@@ -83,39 +85,29 @@ function updateCartSummary() {
     for (const cartItem of cart) {
         totalPrice += cartItem.price;
     }
-
-    // Write the results into the Cart Summary table on the page
-    document.getElementById("summaryItemsCount").textContent   = totalItems;
-    document.getElementById("summaryItemsPrice").textContent   = totalPrice + " QAR";
-    document.getElementById("summaryItemsPayable").textContent = totalPrice + " QAR";
-}
+};
 
 
-// ─── EVENT: "Load Services" button clicked ──────────────────────────────────
-// This is the main trigger. When the user clicks the button:
-//   1. Fetch all services from the backend
-//   2. Clear the table and reset the cart
-//   3. For each service: build a row, wire its checkbox, attach it to the page
 loadUsersButton.addEventListener("click", async () => {
 
     // Step 1: Get the data from the server
-    const services = await fetchServices();
+    const users = await fetchUsers();
 
     // Step 2: Clear any old rows from the table and reset the cart to empty
-    servicesTableBody.innerHTML = "";
+    usersTableBody.innerHTML = "";
     cart = [];
     updateCartSummary();
 
     // Step 3: Loop through every service and add it to the table
-    for (const service of services) {
+    for (const user of users) {
 
         // Build the visual row
-        const row = buildServiceRow(service);
+        const row = buildServiceRow(user);
 
         // Attach the row to the visible table on the page
-        servicesTableBody.appendChild(row);
+        usersTableBody.appendChild(row);
 
         // Connect this row's checkbox to the cart system
-        wireCheckboxToCart(row, service);
+        wireCheckboxToCart(row, user);
     }
 });

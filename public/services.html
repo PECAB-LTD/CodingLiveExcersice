@@ -2,107 +2,103 @@
 
 <html>
 
-<head>
-    <link rel="stylesheet" href="/index.css">
-    <title>SALES.EDU.SERVICES</title>
-</head>
+    <head>
+        <link rel="stylesheet" href="/index.css">
+        <title>SALES.EDU.SERVICES</title>
+    </head>
 
-<body>
-    <div id="companyName">
-        <h1>SALES.EDU - Services</h1>
-        <h2>Where Dreams Come True</h2>
-        <h4>Lets Make Some Sales</h4>
-    </div>
+    <body>
+        <div id="companyName">
+            <h1>SALES.EDU - Services</h1>
+            <h2>Where Dreams Come True</h2>
+            <h4>Lets Make Some Sales</h4>
+        </div>
 
-    <div>
-        <fieldset>
-            <legend>Menu</legend>
-            <a href="/"><button type="button">Home</button></a>
-            <button type="button">Services</button>
-            <a href="/sales"><button type="button">Sales</button></a>
-            <button>Elaija</button>
-            <p>elaijah</p>
-        </fieldset>
-    </div>
+        <div>
+            <fieldset>
+                <legend>Menu</legend>
+                <a href="/"><button type="button">Home</button></a>
+                <button type="button">Services</button>
+                <a href="/sales"><button type="button">Sales</button></a>
+                <a href="/users"><button type="button">Users</button></a>
+            </fieldset>
+        </div>
 
 
-    <div id="topButtons">
-        <fieldset>
-            <legend></legend>
-            <button type="button" id="loadServicesBtn">Load Services</button>
-            <button type="button">Refresh List</button>
-        </fieldset>
-    </div>
+        <div id="topButtons">
+            <fieldset>
+                <legend></legend>
+                <button type="button" id="loadServicesBtn">Load Services</button>
+                <button type="button">Refresh List</button>
+            </fieldset>
+        </div>
 
-    <div id="inventoryFilters">
-        <fieldset>
-            <legend>Filters</legend>
-            <label for="itemId">Item Id:</label>
-            <input type="number" id="itemId" placeholder="Id">
-            <label for="itemName">Item Name:</label>
-            <input type="text" id="itemName" placeholder="Name">
-            <label for="itemCategory">Item Category:</label>
-            <input type="text" id="itemCategory" placeholder="Category">
-            <label for="ItemPrice">Item Price:</label>
-            <input type="number" id="itemPrice" placeholder="Price">
-            <input type="text" placeholder="Elaijah">
+        <div id="inventoryFilters">
+            <fieldset>
+                <legend>Filters</legend>
+                <label for="itemId">Item Id:</label>
+                <input type="number" id="itemId" placeholder="Id">
+                <label for="itemName">Item Name:</label>
+                <input type="text" id="itemName" placeholder="Name">
+                <label for="itemCategory">Item Category:</label>
+                <input type="text" id="itemCategory" placeholder="Category">
+                <label for="ItemPrice">Item Price:</label>
+                <input type="number" id="itemPrice" placeholder="Price">
+                <input type="text" placeholder="Elaijah">
 
-        </fieldset>
-    </div>
+            </fieldset>
+        </div>
 
         <div id="listLoader">
-        <fieldset>
-            <legend>Sales Records</legend>
-            <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
-                <thead>
-                    <tr style="background-color: #f2f2f2;">
-                        <th>Select</th>
-                        <th>ID</th>
-                        <th>Item Name</th>
-                        <th>Price</th>
-                        <th>Category</th>
-                        <th>Inventory</th>
-                        <th>Last Sale</th>
-                    </tr>
-                </thead>
-                <tbody id="salesTableBody">
-                    <!-- JavaScript will insert rows here! -->
-                </tbody>
-            </table>
-        </fieldset>
-    </div>
+            <fieldset>
+                <legend>Services Records</legend>
+                <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: #f2f2f2;">
+                            <th>Select</th>
+                            <th>ID</th>
+                            <th>Item Name</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                            <th>Inventory</th>
+                            <th>Last Sale</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicesTableBody">
+                        <!-- JavaScript will insert rows here! -->
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
 
-    <div>
-        <fieldset>
-            <legend>Cart Summary</legend>
-<table id="cartTable" border="1" style="align-content: center; margin: 1%; padding: 1%; height: fit-content; width: 50%;">
-    <thead id="cartTableHead">
-    <th>Total Items</th>
-    <th>Total Price</th>
-    <th>Discount</th>
-    <th>Payable Price</th>
-    </thead>
-    <tbody id="cartTableDataSummary">
-<tr>
-    <td id="summaryItemsCount">0</td>
-    <td id="summaryItemsPrice">0 QAR</td>
-    <td id="summaryItemsDiscount">0 QAR</td>
-    <td id="summaryItemsPayable">0 QAR</td>
-</tr>
-    </tbody>
-</table>
-        </fieldset>
-    </div>
-    <div id="bottomButtons">
-        <button type="button">
-            Check Out
-        </button>
-    </div>
-
-
-
-<script src="/services.js"></script>
-</body>
-
+        <div>
+            <fieldset>
+                <legend>Cart Summary</legend>
+                <table id="cartTable" border="1"
+                    style="align-content: center; margin: 1%; padding: 1%; height: fit-content; width: 50%;">
+                    <thead id="cartTableHead">
+                        <th>Total Items</th>
+                        <th>Total Price</th>
+                        <th>Discount</th>
+                        <th>Payable Price</th>
+                    </thead>
+                    <tbody id="cartTableDataSummary">
+                        <tr>
+                            <td id="summaryItemsCount">0</td>
+                            <td id="summaryItemsPrice">0 QAR</td>
+                            <td id="summaryItemsDiscount">0 QAR</td>
+                            <td id="summaryItemsPayable">0 QAR</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+        <div id="bottomButtons">
+            <button type="button">
+                Check Out
+            </button>
+        </div>
+        <script src="/services.js"></script>
+    </body>
 
 </html>

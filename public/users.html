@@ -4,24 +4,23 @@
 
 <head>
     <link rel="stylesheet" href="/index.css">
-    <title>SALES.EDU.SERVICES</title>
+    <title>SALES.EDU.USERS</title>
 </head>
 
 <body>
     <div id="companyName">
-        <h1>SALES.EDU - Services</h1>
+        <h1>SALES.EDU - Users</h1>
         <h2>Where Dreams Come True</h2>
-        <h4>Lets Make Some Sales</h4>
+        <h4>Manage Users</h4>
     </div>
 
     <div>
         <fieldset>
             <legend>Menu</legend>
             <a href="/"><button type="button">Home</button></a>
-            <button type="button">Services</button>
+            <a href="/services"><button type="button">Services</button></a>
             <a href="/sales"><button type="button">Sales</button></a>
-            <button>Elaija</button>
-            <p>elaijah</p>
+            <button type="button">Users</button>
         </fieldset>
     </div>
 
@@ -29,12 +28,12 @@
     <div id="topButtons">
         <fieldset>
             <legend></legend>
-            <button type="button" id="loadServicesBtn">Load Services</button>
+            <button type="button" id="loadUsersBtn">Load Users</button>
             <button type="button">Refresh List</button>
         </fieldset>
     </div>
 
-    <div id="inventoryFilters">
+    <div id="usersFilters">
         <fieldset>
             <legend>Filters</legend>
             <label for="itemId">Item Id:</label>
@@ -57,15 +56,17 @@
                 <thead>
                     <tr style="background-color: #f2f2f2;">
                         <th>Select</th>
-                        <th>ID</th>
-                        <th>Item Name</th>
-                        <th>Price</th>
-                        <th>Category</th>
-                        <th>Inventory</th>
-                        <th>Last Sale</th>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Employee Number</th>
+                        <th>Possition</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Password</th>
+                        <th>Created At</th>
                     </tr>
                 </thead>
-                <tbody id="salesTableBody">
+                <tbody id="usersTableBody">
                     <!-- JavaScript will insert rows here! -->
                 </tbody>
             </table>

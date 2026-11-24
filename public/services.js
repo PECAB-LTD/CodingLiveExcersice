@@ -1,7 +1,7 @@
 // ─── PAGE ELEMENTS ──────────────────────────────────────────────────────────
 // These are the HTML elements on the page we will interact with
 const loadServicesButton = document.getElementById("loadServicesBtn");
-const servicesTableBody  = document.getElementById("salesTableBody");
+const servicesTableBody  = document.getElementById("servicesTableBody");
 
 // ─── CART STATE ──────────────────────────────────────────────────────────────
 // The basket. Holds the service objects the user has checked.
