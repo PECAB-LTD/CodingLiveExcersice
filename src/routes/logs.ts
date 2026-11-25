@@ -2,6 +2,8 @@ import { db } from "../data/db";
 
 export async function handleLogsRoute(req, res) {
 
+    //unsupported methods block
+
     if (req.method !== "GET" && req.method !== "POST" && req.method !== "DELETE") {
         res.setHeader("Allow", "GET, POST, DELETE");
         res.statusCode = 405;
@@ -31,6 +33,7 @@ export async function handleLogsRoute(req, res) {
         console.log(newLogs, "NEW SERVICE ADDED!");
         return;
     }
+
 
     if (req.method === "DELETE") {
         const address = new URL(req.url, "http://127.0.0.1:3000");
@@ -108,9 +111,8 @@ export async function handleLogsRoute(req, res) {
     }
 
         //data joined from sales table
-    const allServices = db.prepare(`
-    SELECT 
-        services.*`).all();
-    res.end(JSON.stringify(allServices));
+    const allLogs = db.prepare(`
+    SELECT * FROM logs`).all();
+    res.end(JSON.stringify(allLogs));
     return;
 };

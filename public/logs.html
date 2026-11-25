@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="/index.css">
+    <title>SALES.EDU.LOGS</title>
+</head>
+
+<body>
+    <div id="companyName">
+        <h1>SALES.EDU - lOGS</h1>
+        <h2>Where Dreams Come True</h2>
+        <h4>Control Room</h4>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Menu</legend>
+            <a href="/"><button type="button">Home</button></a>
+            <a href="/services"><button type="button">Services</button></a>
+            <a href="/sales"><button type="button">Sales</button></a>
+            <a href="/users"><button type="button">Users</button></a>
+            <button type="button">Logs</button>
+        </fieldset>
+    </div>
+
+
+    <div id="topButtons">
+        <fieldset>
+            <legend></legend>
+            <button type="button" id="loadLogsBtn">Load Sales</button>
+            <button type="button">Refresh List</button>
+        </fieldset>
+    </div>
+
+    <div id="logFilters">
+        <fieldset>
+            <legend>Filters</legend>
+            <label for="logId">Id:</label>
+            <input type="number" id="logId" placeholder="Id">
+            <label for="logDate">Log Date:</label>
+            <input type="text" id="logDate" placeholder="Date">
+            <label for="logName">Name</label>
+            <input type="text" id="logName" placeholder="Name">
+            <label for="logMethod">Method:</label>
+            <input type="text" id="reqMethod" placeholder="Price">
+        </fieldset>
+    </div>
+
+    <div id="listLoader">
+        <fieldset>
+            <legend>Request Records</legend>
+            <table border="1" width="100%" style="border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Path</th>
+                        <th>Method</th>                      
+                    </tr>
+                </thead>
+                <tbody id="logsTableBody">
+                    <!-- JavaScript will insert rows here! -->
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+    <script src="/logs.js"></script>
+</body>
+
+
+</html>

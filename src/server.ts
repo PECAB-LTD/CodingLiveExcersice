@@ -1,30 +1,31 @@
 import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { runMigrationsAndSeeds } from "./data/migrate";
-
 import { handleServicesRoute } from "./routes/services";
 import { handleSalesRoutes } from "./routes/sales";
 import { handleUsersRoutes } from "./routes/users";
 import { handleLogsRoute } from "./routes/logs";
 import { time, timeStamp } from "node:console";
 import path from "node:path/win32";
+import { db } from "./data/db";
 
 runMigrationsAndSeeds()
-
-
-
-const defineTimeStamp = `[${new Date().toLocaleString()}]`;
+let defineTimeStamp = `[${new Date().toLocaleString()}]`;
 
 const server = createServer((req, res) => {
 
     const address = new URL(req.url, "http://127.0.0.1:3000");
     const pathname = address.pathname;
 
-    const defineTimeStamp = `[${new Date().toLocaleString()}]`;
+    //post server logs to db
 
+    let defineTimeStamp = `${new Date().toLocaleString()}`;
     const serverLogs = defineTimeStamp + " " + "request received for path: " + address.pathname + " " + req.method + " " + address.searchParams.toString();
-    
     console.log(serverLogs);
+    const insertStmt = db.prepare("INSERT INTO logs (date_time, path, method) VALUES (?, ?, ?)");
+    insertStmt.run(defineTimeStamp, pathname, req.method);
+
+
 
     // Serve HTML Dashboard
     if (pathname === "/" || pathname === "/home") {
@@ -118,7 +119,7 @@ const server = createServer((req, res) => {
     }
 
     if (pathname === "/api/logs") {
-        handleUsersRoutes(req, res);
+        handleLogsRoute(req, res);
         return;
     }
 
@@ -138,8 +139,8 @@ const server = createServer((req, res) => {
         return;
     }
 
- serverLogs
-});
-server.listen(3000, "127.0.0.1", () => {
-    console.log(defineTimeStamp,"E-Solutions API is running! on http://localhost:3000");
-});
+
+})
+    ; server.listen(3000, "127.0.0.1", () => {
+        console.log(defineTimeStamp, "E-Solutions API is running! on http://localhost:3000");
+    });
