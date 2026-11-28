@@ -28,6 +28,14 @@ A step-by-step companion book explaining every single concept, line of code, and
 20. [Plucking a Single Record: `.find()` vs `.filter()`](#chapter-20-plucking-a-single-record-find-vs-filter)
 21. [Creating Data with `POST`: Modern Async Streams & Persistence](#chapter-21-creating-data-with-post-modern-async-streams--persistence)
 22. [SQLite Database Persistence & `DELETE` Operations](#chapter-22-sqlite-database-persistence--delete-operations)
+23. [Database Migrations — Evolving Your Schema Safely](#chapter-23-database-migrations--evolving-your-schema-safely)
+24. [Relational Data — SQL JOINs](#chapter-24-relational-data--sql-joins)
+25. [Sync vs Async — The Restaurant Analogy](#chapter-25-sync-vs-async--the-restaurant-analogy)
+26. [Variable Scope — Why You Can't Use a Variable Outside Its Function](#chapter-26-variable-scope--why-you-cant-use-a-variable-outside-its-function)
+27. [Why `return` Stops the Code](#chapter-27-why-return-stops-the-code)
+28. [Request Logging — Writing Every Visitor to the Database](#chapter-28-request-logging--writing-every-visitor-to-the-database)
+29. [`=` vs `==` vs `===` — Assignment vs Comparison](#chapter-29--vs--vs----assignment-vs-comparison)
+30. [Filter Design — `includes()` for Closest Match](#chapter-30-filter-design--includes-for-closest-match)
 
 ---
 
@@ -650,6 +658,278 @@ if (req.method === "DELETE") {
 | **Read (Single)** | `GET /services?id=1` | `.find()` | `200 OK` | `404 Not Found` |
 | **Delete** | `DELETE /services?id=1` | `DELETE FROM services WHERE id = ?` | `200 OK` | `404 Not Found` |
 | **Invalid Method** | `PUT / PATCH` | — | `405 Method Not Allowed` | — |
+
+---
+
+*This guide belongs to the PECAB-LTD / E-Solutions training series. Update it whenever new concepts are introduced.*
+
+---
+
+## Chapter 23: Database Migrations — Evolving Your Schema Safely
+
+### The Problem
+
+When you first create a table with `CREATE TABLE`, it only exists once. If you later need to add a new column, you **cannot** just add it to the `CREATE TABLE` statement — the table already exists, so SQLite skips the whole block.
+
+### The Solution: `ALTER TABLE`
+
+To add a column to an existing table, you use a separate migration file:
+
+```ts
+// 002-add-services-inventory.ts
+const columns = db.pragma("table_info(services)") as { name: string }[];
+const hasInventory = columns.some(col => col.name === "inventory");
+
+if (!hasInventory) {
+    db.prepare("ALTER TABLE services ADD COLUMN inventory INTEGER DEFAULT 0").run();
+}
+```
+
+**What each line does:**
+- `db.pragma("table_info(services)")` — asks SQLite "what columns does this table have?"
+- `.some(col => col.name === "inventory")` — checks if `inventory` already exists
+- `if (!hasInventory)` — only runs the ALTER if the column is missing (safe to re-run)
+- `ALTER TABLE ... ADD COLUMN` — adds the new column without touching existing data
+
+### Migration File Naming Convention
+
+```
+001-create-services-table.ts
+002-add-services-inventory.ts
+003-create-sales-table.ts
+004-add-sales-currency.ts
+005-add-discount-to-services.ts
+006-add-discount-duration.ts
+007-add-users-table.ts
+008-create-logs-table.ts
+```
+
+Numbers at the front guarantee they always run in the right order. The conductor (`migrate.ts`) runs them all in sequence every time the server starts.
+
+> **Key rule:** `CREATE TABLE IF NOT EXISTS` does NOT add new columns to existing tables. Always use `ALTER TABLE` with a PRAGMA guard for new columns.
+
+---
+
+## Chapter 24: Relational Data — SQL JOINs
+
+### The Problem Without JOINs
+
+When you look at a sale record, you only see `service_id = 3`. That number means nothing to a human. You want to show the actual service name and category.
+
+### The Solution: JOIN
+
+A JOIN connects two tables on a matching column:
+
+```sql
+SELECT sales.*, services.name AS service_name, services.category AS service_category
+FROM sales
+INNER JOIN services ON sales.service_id = services.id
+```
+
+**What each part does:**
+- `sales.*` — give me all columns from the sales table
+- `services.name AS service_name` — also grab the name from services, call it `service_name`
+- `INNER JOIN services` — connect to the services table
+- `ON sales.service_id = services.id` — the matching condition (the bridge between tables)
+
+### INNER JOIN vs LEFT JOIN
+
+| JOIN Type | Behaviour |
+|---|---|
+| `INNER JOIN` | Only returns rows where both sides have a match |
+| `LEFT JOIN` | Returns all rows from the left table; if no match on the right, fills with `null` |
+
+Use `LEFT JOIN` when a service might not have any sales yet — `INNER JOIN` would hide it entirely.
+
+---
+
+## Chapter 25: Sync vs Async — The Restaurant Analogy
+
+### Synchronous (sync)
+
+> The waiter takes your order, walks to the kitchen, stands there watching the chef cook, waits for the food, then comes back to you.
+
+Nobody else gets served while they wait. Everything happens **one step at a time**.
+
+`better-sqlite3` is **synchronous** — it runs your SQL and waits for the result before moving on. No `await` needed.
+
+```ts
+const results = db.prepare("SELECT * FROM services").all(); // blocks until done
+```
+
+### Asynchronous (async)
+
+> The waiter takes your order, drops it in the kitchen, goes to serve three other tables, then picks up your food when it's ready.
+
+Multiple things happen at the same time. You need `await` to say "pause here until this finishes before continuing".
+
+```ts
+for await (const chunk of req) { // waits for each piece of the request body
+    body += chunk;
+}
+```
+
+> **Rule of thumb:** `better-sqlite3` = sync (no await). Reading the request body, file system, network = async (needs await).
+
+---
+
+## Chapter 26: Variable Scope — Why You Can't Use a Variable Outside Its Function
+
+### The Rule
+
+A variable declared with `let` or `const` **only exists inside the `{}` block where it was created**.
+
+```ts
+function greet() {
+    const name = "iPhone"; // name lives here
+}
+
+console.log(name); // ❌ ERROR — name doesn't exist out here
+```
+
+The `{}` braces are like walls. Variables can't escape them.
+
+### Why `req` and `res` Can't Be Declared Outside `createServer`
+
+```ts
+// ❌ WRONG — req and res don't exist yet here
+const path = req.url;
+
+const server = createServer((req, res) => {
+    // req and res are created HERE, fresh for every request
+});
+```
+
+`req` and `res` are created by Node.js **per request** — a brand new pair every time someone visits your server. They cannot exist outside `createServer` because there is no request yet.
+
+> **Analogy:** You can't answer a phone call that hasn't come in yet.
+
+---
+
+## Chapter 27: Why `return` Stops the Code
+
+### The Problem
+
+```ts
+res.end("Hello");
+res.end("World"); // ❌ Error — you already answered!
+```
+
+A server can only send **one response** per request. Once you call `res.end()`, you're done.
+
+### `return` = hang up the phone
+
+```ts
+if (req.method === "DELETE") {
+    res.end(JSON.stringify({ message: "Deleted" }));
+    return; // ← stops here, nothing below runs
+}
+
+// This block is only reached if method was NOT DELETE
+res.end(JSON.stringify(allItems));
+```
+
+**"Unreachable code detected"** means TypeScript saw a `return` above and knows nothing below it will ever run. It's a warning that your code structure may be wrong — usually means you put code *after* a `return` by accident.
+
+---
+
+## Chapter 28: Request Logging — Writing Every Visitor to the Database
+
+### The Goal
+
+Every time someone visits any page or hits any API endpoint, write a record to the `logs` table:
+
+```
+id | date_time             | path          | method
+---|-----------------------|---------------|-------
+1  | 11/26/2026, 9:00 AM  | /api/services | GET
+2  | 11/26/2026, 9:01 AM  | /api/sales    | POST
+```
+
+### Where to Put the Log INSERT
+
+It goes inside `createServer`, **before** the route handling — so every request gets logged regardless of which route it hits:
+
+```ts
+const server = createServer((req, res) => {
+    const defineTimeStamp = new Date().toLocaleString(); // live time per request
+
+    db.prepare("INSERT INTO logs (date_time, path, method) VALUES (?, ?, ?)")
+      .run(defineTimeStamp, req.url, req.method);
+
+    // ... route handling below
+});
+```
+
+> **Important:** `defineTimeStamp` MUST be inside `createServer`. If declared outside, it captures the time the server *started*, not the time of the request.
+
+---
+
+## Chapter 29: `=` vs `==` vs `===` — Assignment vs Comparison
+
+| Operator | Name | Use |
+|---|---|---|
+| `=` | **Assignment** | *Puts* a value into a variable |
+| `==` | **Loose Equality** | Compares values, but tries to convert types (avoid this) |
+| `===` | **Strict Equality** | Compares value AND type exactly — always use this |
+
+```ts
+let name = "iPhone";        // = Assignment: store this value
+
+if (name === "iPhone") {    // === Comparison: is this exactly true?
+    console.log("match!");
+}
+```
+
+### The Bug This Caused in Our Code
+
+```ts
+// ❌ BUG — this is assignment inside a filter, not comparison
+results = results.filter(s => s.date_time = logDateText);
+
+// ✅ CORRECT — this compares
+results = results.filter(s => s.date_time === logDateText);
+
+// ✅ EVEN BETTER — partial match (finds "11/26" inside "11/26/2026, 9:00 AM")
+results = results.filter(s => s.date_time.includes(logDateText));
+```
+
+Using `=` inside a `.filter()` doesn't filter — it *overwrites* the value on every row.
+
+---
+
+## Chapter 30: Filter Design — `includes()` for Closest Match
+
+### Why Exact Match Fails for Dates
+
+Your `date_time` is stored as: `"11/26/2026, 9:00:35 AM"`
+
+If a user searches `?date=11/26/2026` with `===`, they get **zero results** because the full string doesn't exactly match.
+
+### The Fix: `.includes()`
+
+```ts
+results = results.filter(s => s.date_time.includes(logDateText));
+```
+
+- `?date=11/26/2026` → matches every log from that day ✅
+- `?date=9:00` → matches every log from that minute ✅
+- `?date=GET` — wait, that's the method, not the date 😄
+
+### The Pattern: Filter → Return Early
+
+```ts
+if (logDateText !== null) {
+    results = results.filter(s => s.date_time.includes(logDateText));
+    res.end(JSON.stringify(results)); // send filtered results
+    return;                           // stop — don't fall through to the full list
+}
+
+// No filter? Send everything
+res.end(JSON.stringify(allLogs));
+```
+
+The `return` after `res.end` is essential — without it, the code falls through and tries to send a second response, which crashes.
 
 ---
 

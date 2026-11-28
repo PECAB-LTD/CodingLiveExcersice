@@ -1,3 +1,4 @@
+import { json, text } from "node:stream/consumers";
 import { db } from "../data/db";
 
 export async function handleLogsRoute(req, res) {
@@ -62,10 +63,12 @@ export async function handleLogsRoute(req, res) {
 
     //url parameters for filtering services
     const address = new URL(req.url, "http://127.0.0.1:3000");
-    const budgetText = address.searchParams.get("budget");
+    //const budgetText = address.searchParams.get("budget");
     const logMethodText = address.searchParams.get("category");
-    const serviceNameText = address.searchParams.get("name");
+    //const serviceNameText = address.searchParams.get("name");
     const logIdText = address.searchParams.get("id");
+
+    const logDateText = address.searchParams.get("date")
 
 
     // Start with all services and apply filters based on query parameters
@@ -75,7 +78,7 @@ export async function handleLogsRoute(req, res) {
     if (logMethodText !== null) {
         results = results.filter(methodText => methodText.method.toLowerCase() === logMethodText.toLowerCase());
 
-        console.log("1. CATEGORY FILTER RAN!");
+        console.log("METHOD FILTER RAN!");
     };
 
     // If a service ID was typed in the URL (?id=1)
@@ -86,28 +89,23 @@ export async function handleLogsRoute(req, res) {
 
         if (singleLogFindresult) {
             res.end(JSON.stringify(singleLogFindresult));
-            console.log("2. SERVICE ID FIND RAN!");
+            console.log("LOG ID FIND RAN!");
             return;
         } else {
             res.statusCode = 404;
             res.end(JSON.stringify({ error: "Service not found" }));
-            console.log("2. SERVICE ID NOT FOUND RAN!");
+            console.log("2. LOG ID NOT FOUND RAN!");
             return;
         };
 
     };
     // If a budget was typed in the URL (?budget=75)
-    if (budgetText !== null) {
-        const budget = Number(budgetText);
-        results = results.filter(s => s.price <= budget);
-
-        console.log("3. BUDGET FILTER RAN!");
-    }
-
-    // If a service name was typed in the URL (?name=Iphone+18+Pro)
-    if (serviceNameText !== null) {
-        results = results.filter(s => s.name.toLowerCase().includes(serviceNameText.toLowerCase()));
-        console.log("4. SERVICE NAME FILTER RAN!");
+    if (logDateText !== null) {
+        const logDate = logDateText;
+        results = results.filter(s => s.date_time.includes(logDate));
+        res.end(JSON.stringify(results));
+        console.log("DATE FILTER RAN!");
+        return;
     }
 
         //data joined from sales table
